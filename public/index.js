@@ -1,6 +1,8 @@
 let companyclicked = false;
 let jobclicked = false;
 let yearclicked = false;
+let table = [];
+let modifiedTable = [];
 
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("btn").addEventListener("click", () => {
@@ -14,61 +16,93 @@ document.addEventListener("DOMContentLoaded", () => {
             }).then(r => r.json())
             .then(res => handleResponse(res));
     });
+    document.getElementById("removeDupe").checked = false;
 });
 
-function addEventListeners(res) {
-    document.getElementById("companyHeader").addEventListener("click", () => handleCompanyClick(res));
-    document.getElementById("jobHeader").addEventListener("click", () => handleJobClick(res));
-    document.getElementById("yearHeader").addEventListener("click", () => handleYearClick(res));
+function addEventListeners() {
+    document.getElementById("companyHeader").addEventListener("click", handleCompanyClick);
+    document.getElementById("jobHeader").addEventListener("click", handleJobClick);
+    document.getElementById("yearHeader").addEventListener("click", handleYearClick);
 }
 
 function handleResponse(res) {
     document.getElementById("btn").disabled = false;
     document.getElementById("jobSearchContainer").hidden = false;
 
-    let modifiedRes = [...res];
-    document.getElementById("jobSearch").addEventListener("input", e => {
-        modifiedRes = handleJobSearch(e.target.value, res);
-        document.getElementById("tableContainer").innerHTML = makeTableHTML(modifiedRes);
-    });
-    document.getElementById("tableContainer").innerHTML = makeTableHTML(modifiedRes);
+    table = res;
+    modifiedTable = [...res];
+    document.getElementById("tableContainer").innerHTML = makeTableHTML(modifiedTable);
 
-    addEventListeners(res);
+    addEventListeners();
+    document.getElementById("jobSearch").addEventListener("input", e => {
+        modifiedTable = handleJobSearch(e.target.value, table);
+        document.getElementById("tableContainer").innerHTML = makeTableHTML(modifiedTable);
+        addEventListeners();
+    });
+    document.getElementById("removeDupe").addEventListener("click", handleDupeClick);
 }
 
-function handleYearClick(res) {
-    document.getElementById("tableContainer").innerHTML = makeTableHTML(res.sort((a, b) => {
+function removeDupes() {
+    let freq = {};
+    let temp = "";
+    for (let i = 0; i < modifiedTable.length; i++) {
+        temp = modifiedTable[i][0].trim().toLowerCase().replace(/[^a-z0-9]/g);
+        if (temp in freq) {
+            freq[temp]++;
+            modifiedTable.splice(i, 1);
+            i--;
+        } else {
+            freq[temp] = 1;
+        }
+    }
+}
+
+function handleDupeClick() {
+    if (!document.getElementById('removeDupe').checked) {
+        modifiedTable = handleJobSearch(document.getElementById("jobSearch").value, table);
+        document.getElementById("tableContainer").innerHTML = makeTableHTML(modifiedTable);
+        addEventListeners();
+        return;
+    }
+    removeDupes();
+    document.getElementById("tableContainer").innerHTML = makeTableHTML(modifiedTable);
+    addEventListeners();
+}
+
+function handleYearClick() {
+    function abysort(a, b) {
         if (!yearclicked)
             return b[2] < a[2] ? -1 : b[2] > a[2];
         return a[2] < b[2] ? -1 : a[2] > b[2];
-    }));
-    addEventListeners(res);
+    }
+    document.getElementById("tableContainer").innerHTML = makeTableHTML(modifiedTable.sort((a, b) => abysort(a, b)));
+    table.sort(abysort);
+    addEventListeners();
     yearclicked = !yearclicked;
     jobclicked = false;
     companyclicked = false;
 }
 
-function handleJobClick(res) {
-    console.log("jobclick");
-    document.getElementById("tableContainer").innerHTML = makeTableHTML(res.sort((a, b) => {
-        if (jobclicked)
-            return b[1].toLowerCase() < a[1].toLowerCase() ? -1 : b[1].toLowerCase() > a[1].toLowerCase();
-        return a[1].toLowerCase() < b[1].toLowerCase() ? -1 : a[1].toLowerCase() > b[1].toLowerCase();
-    }));
-    addEventListeners(res);
+function absort(a, b, tf) {
+    if (tf)
+        return b < a ? -1 : b > a;
+    return a < b ? -1 : a > b;
+}
+
+function handleJobClick() {
+    document.getElementById("tableContainer").innerHTML = makeTableHTML(modifiedTable.sort((a, b) => absort(a[1].toLowerCase(), b[1].toLowerCase(), jobclicked)));
+    table.sort((a, b) => absort(a[1].toLowerCase(), b[1].toLowerCase(), jobclicked));
+    addEventListeners();
     jobclicked = !jobclicked;
     yearclicked = false;
     companyclicked = false;
 }
 
-function handleCompanyClick(res) {
-    console.log("companyclick");
-    document.getElementById("tableContainer").innerHTML = makeTableHTML(res.sort((a, b) => {
-        if (companyclicked)
-            return b[0].toLowerCase() < a[0].toLowerCase() ? -1 : b[0].toLowerCase() > a[0].toLowerCase();
-        return a[0].toLowerCase() < b[0].toLowerCase() ? -1 : a[0].toLowerCase() > b[0].toLowerCase();
-    }));
-    addEventListeners(res);
+function handleCompanyClick() {
+
+    document.getElementById("tableContainer").innerHTML = makeTableHTML(modifiedTable.sort((a, b) => absort(a[0].toLowerCase(), b[0].toLowerCase(), companyclicked)));
+    table.sort((a, b) => absort(a[0].toLowerCase(), b[0].toLowerCase(), companyclicked));
+    addEventListeners();
     jobclicked = false;
     yearclicked = false;
     companyclicked = !companyclicked;
