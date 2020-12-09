@@ -53,7 +53,7 @@ async function getYearDataForMajor(browser, request, sem) {
     const dom = new jsdom.JSDOM(await newPage.content());
     let majorsData = Array.from(dom.window.document.querySelector("#resultstbl > tbody").children).map(e => e.id.match(/majorrepeater*/g) ? e.children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].innerHTML.trim().replace("<b>Major: </b>", "").replace("&amp;", "&") : e.children[0].children[0]);
     let majorTable = majorsData[majorsData.indexOf(request.body[1]) + 1];
-    let majorData = Array.from(majorTable.children[0].children).slice(1, -1).map(el => Array.from(el.children).concat([sem.substr(0, 4) + " " + letToSemester[sem.slice(-1)]]).map((ele, i) => i > 1 ? ele : ele.innerHTML));
+    let majorData = Array.from(majorTable.children[0].children).slice(1, -1).map(el => Array.from(el.children).concat([sem.substr(0, 4) + " " + letToSemester[sem.slice(-1)]]).map((ele, i) => i > 1 ? ele : ele.innerHTML == "" ? "(Blank)" : ele.innerHTML));
     await newPage.close();
     await context.close();
     return majorData;
