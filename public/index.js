@@ -6,7 +6,6 @@ let modifiedTable = [];
 
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("btn").addEventListener("click", (async() => {
-        console.log("pressed?");
         let postdata = [];
         document.getElementById("btn").disabled = true;
         document.querySelectorAll(".entry").forEach(e => postdata.push(e.value));
@@ -19,7 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
         let res2 = res.clone();
         let textValue = await res.text();
         if (textValue.includes("[")) {
-            console.log(textValue)
             handleResponse(await res2.json());
         } else {
             document.getElementById("tableContainer").innerHTML = `<p style="color: red">${textValue}</p>`
@@ -76,7 +74,6 @@ function handleDupeClick() {
         addEventListeners();
         return;
     }
-    console.log("not in if loop");
     removeDupes();
     document.getElementById("tableContainer").innerHTML = makeTableHTML(modifiedTable);
     addEventListeners();
