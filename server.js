@@ -35,9 +35,9 @@ async function getYearDataForMajor(browser, request, sem) {
     ]);
     //await new Promise(r => setTimeout(r, 2000));
 
-    let val = await page.selectOption('#ddlWHCollege', request.body[0]);
+    let val = await page.selectOption('#ddlWHCollege', request[0]);
     if (val.length == 0) {
-        await page.selectOption('#ddlWHCollege', request.body[0] + " ");
+        await page.selectOption('#ddlWHCollege', request[0] + " ");
     }
 
     const [newPage] = await Promise.all([
@@ -52,7 +52,7 @@ async function getYearDataForMajor(browser, request, sem) {
 
     const dom = new jsdom.JSDOM(await newPage.content());
     let majorsData = Array.from(dom.window.document.querySelector("#resultstbl > tbody").children).map(e => e.id.match(/majorrepeater*/g) ? e.children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].innerHTML.trim().replace("<b>Major: </b>", "").replace("&amp;", "&") : e.children[0].children[0]);
-    let majorTable = majorsData[majorsData.indexOf(request.body[1]) + 1];
+    let majorTable = majorsData[majorsData.indexOf(request[1]) + 1];
     let majorData = Array.from(majorTable.children[0].children).slice(1, -1).map(el => Array.from(el.children).concat([sem.substr(0, 4) + " " + letToSemester[sem.slice(-1)]]).map((ele, i) => i > 1 ? ele : ele.innerHTML == "" ? "(Blank)" : ele.innerHTML));
     await newPage.close();
     await context.close();
@@ -78,17 +78,20 @@ async function getMajorData(request, browser) {
 }
 
 router.post('/send', (request, response) => {
+    let reqbody = [];
+    reqbody.push(request.body[0].replace(/[^A-Za-z0-9&-./, ]/g, ""));
+    reqbody.push(request.body[1].replace(/[^A-Za-z0-9&-./, ]/g, ""));
     (async() => {
-        console.log(request.body);
-        if (cache.getKey(request.body) !== undefined) {
+        console.log(reqbody);
+        if (cache.getKey(reqbody) !== undefined) {
             response.set('Content-Type', 'text/html');
-            response.send(cache.getKey(request.body));
+            response.send(cache.getKey(reqbody));
             return;
         }
         const browser = await firefox.launch();
-        let majorData = await getMajorData(request, browser);
+        let majorData = await getMajorData(reqbody, browser);
 
-        cache.setKey(request.body, majorData);
+        cache.setKey(reqbody, majorData);
         cache.save();
         response.set('Content-Type', 'text/html');
         response.send(majorData);

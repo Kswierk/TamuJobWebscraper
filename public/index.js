@@ -35,7 +35,10 @@ function handleResponse(res) {
 
     addEventListeners();
     document.getElementById("jobSearch").addEventListener("input", e => {
-        modifiedTable = handleJobSearch(e.target.value, table);
+        handleJobSearch(e.target.value, table);
+        if (document.getElementById('removeDupe').checked) {
+            removeDupes();
+        }
         document.getElementById("tableContainer").innerHTML = makeTableHTML(modifiedTable);
         addEventListeners();
     });
@@ -59,11 +62,12 @@ function removeDupes() {
 
 function handleDupeClick() {
     if (!document.getElementById('removeDupe').checked) {
-        modifiedTable = handleJobSearch(document.getElementById("jobSearch").value, table);
+        handleJobSearch(document.getElementById("jobSearch").value, table);
         document.getElementById("tableContainer").innerHTML = makeTableHTML(modifiedTable);
         addEventListeners();
         return;
     }
+    console.log("not in if loop");
     removeDupes();
     document.getElementById("tableContainer").innerHTML = makeTableHTML(modifiedTable);
     addEventListeners();
@@ -71,9 +75,20 @@ function handleDupeClick() {
 
 function handleYearClick() {
     function abysort(a, b) {
-        if (!yearclicked)
-            return b[2] < a[2] ? -1 : b[2] > a[2];
-        return a[2] < b[2] ? -1 : a[2] > b[2];
+        let arrA = a[2].split(" ");
+        let arrB = b[2].split(" ");
+        let semObj = {
+            "Fall": 2,
+            "Summer": 1,
+            "Spring": 0
+        }
+        let result = 0;
+        if (arrA[0] == arrB[0]) {
+            result = semObj[arrA[1]] < semObj[arrB[1]] ? -1 : semObj[arrA[1]] > semObj[arrB[1]];
+        } else {
+            result = parseInt(arrA[0]) < parseInt(arrB[0]) ? -1 : parseInt(arrA[0]) > parseInt(arrB[0]);
+        }
+        return yearclicked ? result : result * -1;
     }
     document.getElementById("tableContainer").innerHTML = makeTableHTML(modifiedTable.sort((a, b) => abysort(a, b)));
     table.sort(abysort);
@@ -84,9 +99,8 @@ function handleYearClick() {
 }
 
 function absort(a, b, tf) {
-    if (tf)
-        return b < a ? -1 : b > a;
-    return a < b ? -1 : a > b;
+    let result = b < a ? -1 : b > a;
+    return tf ? result : result * -1;
 }
 
 function handleJobClick() {
@@ -115,7 +129,7 @@ function handleJobSearch(inputString, array) {
             newArray.push(array[i]);
         }
     }
-    return newArray;
+    modifiedTable = [...newArray];
 }
 
 function makeTableHTML(ar) {
