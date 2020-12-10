@@ -5,17 +5,26 @@ let table = [];
 let modifiedTable = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("btn").addEventListener("click", () => {
+    document.getElementById("btn").addEventListener("click", (async() => {
+        console.log("pressed?");
         let postdata = [];
         document.getElementById("btn").disabled = true;
         document.querySelectorAll(".entry").forEach(e => postdata.push(e.value));
-        fetch("http://localhost:8000/send", {
-                method: 'post',
-                body: JSON.stringify(postdata),
-                headers: { 'content-type': 'application/json' }
-            }).then(r => r.json())
-            .then(res => handleResponse(res));
-    });
+        let res = await fetch("http://localhost:8000/send", {
+            method: 'post',
+            body: JSON.stringify(postdata),
+            headers: { 'content-type': 'application/json' }
+        });
+        document.getElementById("btn").disabled = false;
+        let res2 = res.clone();
+        let textValue = await res.text();
+        if (textValue.includes("[")) {
+            console.log(textValue)
+            handleResponse(await res2.json());
+        } else {
+            document.getElementById("tableContainer").innerHTML = `<p style="color: red">${textValue}</p>`
+        }
+    }));
     document.getElementById("removeDupe").checked = false;
 });
 
@@ -26,7 +35,7 @@ function addEventListeners() {
 }
 
 function handleResponse(res) {
-    document.getElementById("btn").disabled = false;
+
     document.getElementById("jobSearchContainer").hidden = false;
 
     table = res;
