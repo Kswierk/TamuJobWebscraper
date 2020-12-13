@@ -19,10 +19,10 @@ let cache = flatCache.load('server');
 
 app.use(express.json());
 
-app.use(express.static('F:/dev/Tamu CS hiring data/public/'));
+app.use(express.static(__dirname + '/public'));
 
 router.get('/', (req, res) => {
-    res.sendFile("F:/dev/Tamu CS hiring data/public/index.html");
+    res.sendFile(__dirname + "/public/index.html");
 });
 
 async function getYearDataForMajor(browser, request, sem) {
