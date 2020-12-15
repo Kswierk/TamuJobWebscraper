@@ -44,10 +44,15 @@ async function getYearDataForMajor(browser, request, sem) {
     }
     //console.log(val);
     //await page.screenshot({ path: 'my_screenshot.png', fullPage: true });
-    const [newPage] = await Promise.all([
-        context.waitForEvent('page'),
-        (await page.click('#btnWHSelect'))
-    ]);
+    try {
+        const [newPage] = await Promise.all([
+            context.waitForEvent('page'),
+            (await page.click('#btnWHSelect'))
+        ]);
+    } catch (e) {
+        throw (e);
+    }
+
     await page.close();
 
     await newPage.waitForLoadState();
