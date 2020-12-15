@@ -1,3 +1,37 @@
 #companyHeader {
     cursor: pointer;
 }
+
+#btn {
+    border-radius: 5px;
+    height: 25px;
+}
+
+#btn:disabled {
+    animation: fading 2s infinite;
+    -webkit-animation: fading 2s infinite;
+}
+
+@keyframes fading {
+    0% {
+        background: rgb(59, 59, 59);
+    }
+    50% {
+        background: white;
+    }
+    100% {
+        background: rgb(59, 59, 59);
+    }
+}
+
+@-webkit-keyframes fading {
+    0% {
+        background: rgb(59, 59, 59);
+    }
+    50% {
+        background: white;
+    }
+    100% {
+        background: rgb(59, 59, 59);
+    }
+}
