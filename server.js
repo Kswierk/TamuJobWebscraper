@@ -36,12 +36,14 @@ async function getYearDataForMajor(browser, request, sem) {
     //await new Promise(r => setTimeout(r, 10000));
     let val = await page.selectOption('#ddlWHCollege', request[0]);
     if (val.length == 0) {
-        val = await page.selectOption('#ddlWHCollege', request[0] + " ");
+        val = await page.selectOption('#ddlWHCollege', request[0] + " "); //there is a space on atleast one of the listings
     }
     if (val.length == 0) {
+        console.log("cant find col")
         throw ("cant find college");
     }
-    await page.screenshot({ path: 'my_screenshot.png', fullPage: true });
+    console.log(val);
+    //await page.screenshot({ path: 'my_screenshot.png', fullPage: true });
     const [newPage] = await Promise.all([
         context.waitForEvent('page'),
         (await page.click('#btnWHSelect'))
@@ -98,8 +100,8 @@ router.post('/send', (request, response) => {
     let majorData = [
         [""]
     ];
-    if(reqbody[0].length == 0 || reqbody[0].length > 40 || reqbody[1].length == 0 || reqbody[1].length > 40){
-	response.set('Content-Type', 'text/plain');
+    if (reqbody[0].length == 0 || reqbody[0].length > 40 || reqbody[1].length == 0 || reqbody[1].length > 40) {
+        response.set('Content-Type', 'text/plain');
         response.send("Enter a valid college / major");
         return;
     }
