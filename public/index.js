@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let postdata = [];
         document.getElementById("btn").disabled = true;
         document.querySelectorAll(".entry").forEach(e => postdata.push(e.value));
-        let res = await fetch("http://localhost:8000/send", {
+        let res = await fetch("/send", {
             method: 'post',
             body: JSON.stringify(postdata),
             headers: { 'content-type': 'application/json' }

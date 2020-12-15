@@ -1,6 +1,6 @@
 const express = require('express');
 const fetch = require('node-fetch');
-const { firefox } = require('playwright');
+const { webkit } = require('playwright-webkit');
 const jsdom = require('jsdom');
 
 const router = express.Router();
@@ -106,7 +106,7 @@ router.post('/send', (request, response) => {
             response.send(cache.getKey(reqbody));
             return;
         }
-        const browser = await firefox.launch();
+        const browser = await webkit.launch();
         try {
             majorData = await getMajorData(reqbody, browser);
         } catch (e) {
