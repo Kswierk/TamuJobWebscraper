@@ -26,8 +26,8 @@ router.get('/', (req, res) => {
 });
 
 async function getYearDataForMajor(browser, request, sem) {
-    const context = await browser.newContext();
-    const page = await context.newPage();
+    let context = await browser.newContext();
+    let page = await context.newPage();
     await page.goto('https://aggiesurveys.tamu.edu/public/Reports.aspx');
     await Promise.all([
         page.selectOption('#ddlWHSemester', sem),
@@ -49,7 +49,7 @@ async function getYearDataForMajor(browser, request, sem) {
     try {
         [newPage] = await Promise.all([
             context.waitForEvent('page'),
-            (await page.click('#btnWHSelect'))
+            (await page.$('#btnWHSelect')).click()
         ]);
     } catch (e) {
         throw (e);
@@ -61,14 +61,14 @@ async function getYearDataForMajor(browser, request, sem) {
 
     console.log(await newPage.title());
 
-    const dom = new jsdom.JSDOM(await newPage.content());
+    let dom = new jsdom.JSDOM(await newPage.content());
     //array alternating from major name to a html table of jobs
     let majorsData = Array.from(dom.window.document.querySelector("#resultstbl > tbody").children).map(e => e.id.match(/majorrepeater*/g) ? e.children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].children[0].innerHTML.trim().replace("<b>Major: </b>", "").replace("&amp;", "&") : e.children[0].children[0]);
     //returns html table of the major
-    if (majorsData.indexOf(request[1]) == -1) //return empty array if it can't find it
-        return [
-        []
-    ];
+    if (majorsData.indexOf(request[1]) == -1) { //return empty array if it can't find it
+        console.log("empty");
+        return [];
+    }
     let majorTable = majorsData[majorsData.indexOf(request[1]) + 1];
     //makes 2d array out of table
     let majorData = Array.from(majorTable.children[0].children).slice(1, -1).map(el => Array.from(el.children).concat([sem.substr(0, 4) + " " + letToSemester[sem.slice(-1)]]).map((ele, i) => i > 1 ? ele : ele.innerHTML == "" ? "(Blank)" : ele.innerHTML));
@@ -81,7 +81,7 @@ async function getMajorData(request, browser) {
 
 
     let htmlResp = await (await fetch("https://aggiesurveys.tamu.edu/public/Reports.aspx")).text();
-    const dom = new jsdom.JSDOM(htmlResp);
+    let dom = new jsdom.JSDOM(htmlResp);
     let semesters = Array.from(dom.window.document.querySelector("#ddlWHSemester").children).map(el => el.value).slice(1);
     let majorData = [];
     let temp = [];
@@ -90,7 +90,7 @@ async function getMajorData(request, browser) {
         temp = semesters.splice(0, threads);
         console.log(temp);
         try {
-            (await Promise.all(temp.map(el => getYearDataForMajor(browser, request, el)))).forEach(e => majorData.push(...e));
+            (await Promise.all(temp.map(el => getYearDataForMajor(browser, request, el)))).forEach(e => e.length != 0 ? majorData.push(...e) : "");
         } catch (e) {
             throw (e);
         }
@@ -119,7 +119,7 @@ router.post('/send', (request, response) => {
             response.send(cache.getKey(reqbody));
             return;
         }
-        const browser = await chromium.launch();
+        let browser = await chromium.launch();
         try {
             majorData = await getMajorData(reqbody, browser);
         } catch (e) {
