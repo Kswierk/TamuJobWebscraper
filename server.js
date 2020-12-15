@@ -39,10 +39,10 @@ async function getYearDataForMajor(browser, request, sem) {
         val = await page.selectOption('#ddlWHCollege', request[0] + " "); //there is a space on atleast one of the listings
     }
     if (val.length == 0) {
-        console.log("cant find col")
+        //console.log("cant find col")
         throw ("cant find college");
     }
-    console.log(val);
+    //console.log(val);
     //await page.screenshot({ path: 'my_screenshot.png', fullPage: true });
     const [newPage] = await Promise.all([
         context.waitForEvent('page'),
@@ -78,7 +78,7 @@ async function getMajorData(request, browser) {
     let semesters = Array.from(dom.window.document.querySelector("#ddlWHSemester").children).map(el => el.value).slice(1);
     let majorData = [];
     let temp = [];
-    let threads = 18;
+    let threads = 4;
     while (semesters.length > 0) {
         temp = semesters.splice(0, threads);
         console.log(temp);
