@@ -42,10 +42,12 @@ async function getYearDataForMajor(browser, request, sem) {
         //console.log("cant find col")
         throw ("cant find college");
     }
+    await new Promise(r => setTimeout(r, 500));
     //console.log(val);
     //await page.screenshot({ path: 'my_screenshot.png', fullPage: true });
+    let newPage
     try {
-        const [newPage] = await Promise.all([
+        [newPage] = await Promise.all([
             context.waitForEvent('page'),
             (await page.click('#btnWHSelect'))
         ]);
