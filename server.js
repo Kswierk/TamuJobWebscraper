@@ -48,7 +48,7 @@ async function getYearDataForMajor(browser, request, sem) {
     let newPage
     try {
         [newPage] = await Promise.all([
-            context.waitForEvent('page'),
+            context.waitForEvent('page', { setTimeout: 0 }),
             (await page.$('#btnWHSelect')).click()
         ]);
     } catch (e) {
