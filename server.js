@@ -1,6 +1,6 @@
 const express = require('express');
 const fetch = require('node-fetch');
-const { webkit } = require('playwright-webkit');
+const { chromium } = require('playwright');
 const jsdom = require('jsdom');
 
 const router = express.Router();
@@ -33,8 +33,7 @@ async function getYearDataForMajor(browser, request, sem) {
         page.selectOption('#ddlWHSemester', sem),
         page.waitForNavigation({ waitUntil: 'load' })
     ]);
-    //await new Promise(r => setTimeout(r, 2000));
-
+    //await new Promise(r => setTimeout(r, 10000));
     let val = await page.selectOption('#ddlWHCollege', request[0]);
     if (val.length == 0) {
         val = await page.selectOption('#ddlWHCollege', request[0] + " ");
@@ -42,10 +41,10 @@ async function getYearDataForMajor(browser, request, sem) {
     if (val.length == 0) {
         throw ("cant find college");
     }
-
+    await page.screenshot({ path: 'my_screenshot.png', fullPage: true });
     const [newPage] = await Promise.all([
         context.waitForEvent('page'),
-        page.click('#btnWHSelect')
+        (await page.click('#btnWHSelect'))
     ]);
     await page.close();
 
@@ -99,6 +98,11 @@ router.post('/send', (request, response) => {
     let majorData = [
         [""]
     ];
+    if(reqbody[0].length == 0 || reqbody[0].length > 40 || reqbody[1].length == 0 || reqbody[1].length > 40){
+	response.set('Content-Type', 'text/plain');
+        response.send("Enter a valid college / major");
+        return;
+    }
     (async() => {
         console.log(reqbody);
         if (cache.getKey(reqbody) !== undefined) {
@@ -106,7 +110,7 @@ router.post('/send', (request, response) => {
             response.send(cache.getKey(reqbody));
             return;
         }
-        const browser = await webkit.launch();
+        const browser = await chromium.launch();
         try {
             majorData = await getMajorData(reqbody, browser);
         } catch (e) {
