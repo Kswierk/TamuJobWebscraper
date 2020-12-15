@@ -126,6 +126,7 @@ router.post('/send', (request, response) => {
             console.log(e);
             response.set('Content-Type', 'text/plain');
             response.send(e);
+            await browser.close();
             return;
         }
         let notempty = false;
@@ -137,6 +138,7 @@ router.post('/send', (request, response) => {
         if (!notempty) {
             response.set('Content-Type', 'text/plain');
             response.send("Can't find major");
+            await browser.close();
             return;
         }
         cache.setKey(reqbody, majorData);
