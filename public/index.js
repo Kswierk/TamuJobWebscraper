@@ -38,7 +38,6 @@ function handleResponse(res) {
 
     table = res;
     modifiedTable = [...res];
-    console.log(modifiedTable);
     document.getElementById("tableContainer").innerHTML = makeTableHTML(modifiedTable);
 
     addEventListeners();
