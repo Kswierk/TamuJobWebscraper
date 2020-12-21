@@ -1,14 +1,3 @@
-*{
-    box-sizing: border-box;
-    padding:0;
-    margin: 0;
-    font-family: 'Roboto', sans-serif;
-}
-body{
-    background-color: rgb(250, 250, 250);
-
-}
-
 #companyHeader {
     cursor: pointer;
 }
@@ -23,58 +12,13 @@ body{
 
 #btn {
     border-radius: 5px;
-    border:none;
-    padding: .6rem 1.5rem;
-    margin: 30px 0;
-    cursor: pointer;
-}
-
-input:focus{
-    outline: none;
+    height: 25px;
 }
 
 #btn:disabled {
     animation: fading 2s infinite;
     -webkit-animation: fading 2s infinite;
 }
-
-
-
-#majorSearchContainer{
-    max-width: 500px;
-    display:flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 0 auto;
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-    background-color: white;
-    border-radius: 4px;
-}
-
-.flex-wraper{
-    display: flex;
-    flex-direction:column;
-    margin: 15px auto;
-    width: 50%;
-}
-
-label {
-    margin-bottom: 5px;
-}
-
-#major,
-#college {
-padding: 1px;
-}
-
-
-
-#informative{
-margin: 50px auto;
-text-align: center;
-}
-
-
 
 @keyframes fading {
     0% {
