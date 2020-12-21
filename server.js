@@ -30,8 +30,8 @@ async function getYearDataForMajor(browser, request, sem) {
     let page = await context.newPage();
     await page.goto('https://aggiesurveys.tamu.edu/public/Reports.aspx');
     await Promise.all([
-        page.selectOption('#ddlWHSemester', sem),
-        page.waitForNavigation({ waitUntil: 'load' })
+        page.waitForNavigation({ waitUntil: 'load' }),
+        page.selectOption('#ddlWHSemester', sem)
     ]);
     //await new Promise(r => setTimeout(r, 10000));
     let val = await page.selectOption('#ddlWHCollege', request[0]);
@@ -45,7 +45,7 @@ async function getYearDataForMajor(browser, request, sem) {
     //await new Promise(r => setTimeout(r, 500));
     //console.log(val);
     await page.screenshot({ path: 'my_screenshot.png', fullPage: true });
-    let newPage
+    let newPage;
     try {
         [newPage] = await Promise.all([
             context.waitForEvent('page', { setTimeout: 10000000 }),
@@ -57,7 +57,7 @@ async function getYearDataForMajor(browser, request, sem) {
 
     await page.close();
 
-    await newPage.waitForLoadState();
+    //await newPage.waitForLoadState();
 
     console.log(await newPage.title());
 
