@@ -48,7 +48,7 @@ async function getYearDataForMajor(browser, request, sem) {
     let newPage;
     try {
         [newPage] = await Promise.all([
-            context.waitForEvent('page', { setTimeout: 10000000 }),
+            context.waitForEvent('page', { setTimeout: 0 }),
             (await page.$('#btnWHSelect')).click()
         ]);
     } catch (e) {
@@ -85,7 +85,7 @@ async function getMajorData(request, browser) {
     let semesters = Array.from(dom.window.document.querySelector("#ddlWHSemester").children).map(el => el.value).slice(1);
     let majorData = [];
     let temp = [];
-    let threads = 4;
+    let threads = 1;
     while (semesters.length > 0) {
         temp = semesters.splice(0, threads);
         console.log(temp);
