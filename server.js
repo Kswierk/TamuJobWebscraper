@@ -62,7 +62,8 @@ async function getYearDataForMajor(browser, request, sem) {
         context.waitForEvent('page'),
         (await page.$('#btnWHSelect')).click()
     ], 30000, null);
-    console.log(isError);
+    if(isError !== undefined)
+	throw("timeout");
 
     await page.close();
 
